@@ -641,3 +641,23 @@ body {
 .vu-retro .retro-vu:hover .retro-needle::after {
     box-shadow: 0 0 4px var(--primary-color);
 }
+
+/* Accessibility: Focus States */
+
+/* Add a visible outline for keyboard users */
+.console-btn:focus-visible,
+.theme-btn:focus-visible,
+.vu-style-btn:focus-visible,
+.station-selector select:focus-visible {
+    outline: 3px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+/* For range inputs, it's better to style the thumb */
+.volume-control input[type="range"]:focus-visible::-webkit-slider-thumb {
+    box-shadow: 0 0 0 3px var(--bg-color), 0 0 0 5px var(--primary-color);
+}
+
+.volume-control input[type="range"]:focus-visible::-moz-range-thumb {
+    box-shadow: 0 0 0 3px var(--bg-color), 0 0 0 5px var(--primary-color);
+}

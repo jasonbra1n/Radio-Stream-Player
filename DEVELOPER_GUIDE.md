@@ -17,8 +17,11 @@ The project consists of a few key files:
 
 - `index.html`: The main entry point and structure for the application. It contains the player UI, station list, and control buttons.
 - `popout.html`: A minimal version of the UI for the pop-out player window. It communicates with the main window via `postMessage`.
+- `stations.js`: A simple ES module that exports the array of default radio stations.
+- `player.js`: An ES module that handles all core player logic, including audio playback, UI controls (play, volume, station select), and state management.
+- `visualizer.js`: An ES module responsible for all Web Audio API analysis, canvas/DOM drawing, and VU meter style logic.
 - `styles.css`: Contains all styling for the application, including layout, theming (light/dark modes), and the appearance of all VU meter styles.
-- `script.js`: The core of the application. It handles all logic, including audio playback, state management, Web Audio API setup, visualization rendering, and UI event handling.
+- `script.js`: The main entry point. It imports the other modules (`player.js`, `visualizer.js`) and initializes the application. It also contains the theme management logic.
 - `README.md`: The user-facing documentation.
 - `DEVELOPER_GUIDE.md`: (This file) The technical documentation for contributors.
 
@@ -26,7 +29,7 @@ The project consists of a few key files:
 
 ### 3.1. Global State Management (`radioStreamState`)
 
-To manage state across different contexts (main window vs. pop-out) and to persist state if the script were re-initialized, a single global object `radioStreamState` is attached to the `window` object.
+To manage state across different contexts (main window vs. pop-out) and to persist state if the script were re-initialized, a single global object `radioStreamState` is attached to the `window` object. It is defined and exported from `player.js`.
 
 ```javascript
 const radioStreamState = window.radioStreamState || {
@@ -46,7 +49,7 @@ window.radioStreamState = radioStreamState;
 
 ### 3.2. Web Audio API Graph
 
-The audio visualization is powered by the Web Audio API. The audio signal flows through a series of connected nodes:
+The audio visualization is powered by the Web Audio API. The audio signal flows through a series of connected nodes, all of which are created and managed within `visualizer.js`.
 
 1.  **`<audio>` Element**: The source of the stream.
 2.  **`MediaElementAudioSourceNode`**: Connects the `<audio>` element to the Web Audio API graph.
@@ -77,7 +80,7 @@ The audio visualization is powered by the Web Audio API. The audio signal flows 
 
 ### 3.3. Visualization Engine
 
-The visualization is handled by a `requestAnimationFrame` loop inside the `updateVUMeters` function.
+The visualization is handled by a `requestAnimationFrame` loop inside the `updateVUMeters` function within `visualizer.js`.
 
 - **Loop**: On each frame, it gets the latest audio data from the `AnalyserNode`s.
 - **Style Switching**: A `switch` statement checks the current `state.vuStyle` and calls the appropriate rendering function (e.g., `updateClassicVu`, `updateLedVu`).
@@ -94,14 +97,16 @@ The pop-out feature uses `window.open()` to create a new, smaller browser window
 
 ### 4.1. Adding a New Radio Station
 
-This is the simplest contribution.
-1.  Open `index.html`.
-2.  Add a new `<option>` element inside the `<select id="station-select">` dropdown.
-3.  The `value` attribute must be the direct URL to the audio stream.
-4.  The text content of the option is the display name for the station.
+This is the simplest contribution. The station list is now managed in its own file.
+1.  Open `stations.js`.
+2.  Add a new object to the `stations` array.
+3.  The object must have a `name` (string) and a `url` (string) to the audio stream.
 
-```html
-<option value="https://your-stream-url/stream">My New Station</option>
+```javascript
+export const stations = [
+    // ... existing stations
+    { name: "My New Station", url: "https://your-stream-url/stream" }
+];
 ```
 
 ### 4.2. Adding a New VU Meter Style

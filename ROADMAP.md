@@ -8,14 +8,14 @@ This document outlines the future direction and planned features for the Radio S
 
 *These are improvements focused on code quality, accessibility, and minor feature additions.*
 
--   **[ ] Code Refactoring:**
+-   **[x] Code Refactoring:**
     -   Modularize `script.js` by separating the core player logic from the VU meter visualization logic. This will improve maintainability and make it easier to add new visualizers.
--   **[ ] Accessibility (A11y) Enhancements:**
+-   **[x] Accessibility (A11y) Enhancements:**
     -   Add `aria-label` attributes to all interactive controls (buttons, sliders) for better screen reader support.
     -   Ensure full keyboard navigability for all player functions.
     -   Implement focus-visible states for better keyboard navigation feedback.
 -   **[ ] UI/UX Improvements:**
-    -   Add a visual indicator or tooltip to the "Cycle VU Meter" button to show the name of the current style.
+    -   **[x]** Add a visual indicator or tooltip to the "Cycle VU Meter" button to show the name of the current style.
     -   Improve the pop-out window closing mechanism to be more robust.
 -   **[ ] Content:**
     -   Add more high-quality radio streams to the default list.

@@ -32,3 +32,21 @@ This version represents the foundational release of the player, including all co
 -   **Theming:** Implemented Light and Dark themes with automatic detection of user's system preference and a manual toggle.
 -   **Pop-out Player:** Added a feature to launch the player in a separate, compact window for easy multitasking.
 -   **Documentation:** Created a comprehensive `README.md` for users and a `DEVELOPER_GUIDE.md` for contributors.
+
+---
+
+## ✅ Version 1.1 (Refactoring & Accessibility)
+
+*Date: [Your Current Date Here]*
+
+This version focused on improving the codebase architecture and enhancing accessibility, setting a strong foundation for future features.
+
+### Code Quality
+-   **Code Refactoring:** Modularized the monolithic `script.js` into three distinct files: `player.js` (core logic), `visualizer.js` (audio analysis and drawing), and `stations.js` (data). This greatly improves maintainability.
+
+### Accessibility (A11y)
+-   **Screen Reader Support:** Added `aria-label` attributes to all icon-only buttons and interactive controls.
+-   **Keyboard Navigation:** Implemented `:focus-visible` CSS states to provide clear visual outlines for keyboard users without cluttering the UI for mouse users.
+
+### UI/UX Improvements
+-   **VU Meter Tooltip:** The VU meter style-cycle button now has a dynamic tooltip that displays the name of the current style (e.g., "Style: Classic").

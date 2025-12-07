@@ -1,4 +1,4 @@
-window.radioStreamState = window.radioStreamState || {
+const radioStreamState = window.radioStreamState || {
     audio: null,
     isPlaying: false,
     currentStation: null,
@@ -12,13 +12,40 @@ window.radioStreamState = window.radioStreamState || {
     popoutWindow: null,
     vuStyle: 1 // Track current VU meter style (1 = LED default)
 };
+window.radioStreamState = radioStreamState;
 
 const VU_STYLES = [
     'classic', 'led', 'circular', 'waveform', 'spectrum', 'retro'
 ];
 
+function initThemeSwitcher() {
+    const themeToggleBtn = document.getElementById('theme-toggle-btn');
+    if (!themeToggleBtn) return;
+
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+
+    function applyTheme(isDark) {
+        if (isDark) {
+            document.documentElement.classList.add('dark-theme');
+            themeToggleBtn.textContent = '☀️';
+        } else {
+            document.documentElement.classList.remove('dark-theme');
+            themeToggleBtn.textContent = '🌙';
+        }
+    }
+
+    themeToggleBtn.addEventListener('click', () => {
+        const isDark = document.documentElement.classList.contains('dark-theme');
+        applyTheme(!isDark);
+    });
+
+    // Set initial theme
+    applyTheme(prefersDark.matches);
+    prefersDark.addEventListener('change', (e) => applyTheme(e.matches));
+}
+
 function initRadioStreamPlayer() {
-    const state = window.radioStreamState;
+    const state = radioStreamState;
     let audio = state.audio;
     let audioContext = state.audioContext;
     let source = state.source;
@@ -32,6 +59,7 @@ function initRadioStreamPlayer() {
     const volumeSlider = document.getElementById('volume-slider');
     const nowPlaying = document.getElementById('now-playing');
     const leftVu = document.getElementById('left-vu');
+    const popoutNotice = document.getElementById('popout-notice');
     const rightVu = document.getElementById('right-vu');
     const vuMeters = document.querySelector('.vu-meters');
 
@@ -498,6 +526,7 @@ function initRadioStreamPlayer() {
 
     popoutBtn.addEventListener('click', () => {
         if (state.popoutWindow && !state.popoutWindow.closed) {
+            // If popout exists, just focus it.
             state.popoutWindow.focus();
             return;
         }
@@ -509,13 +538,22 @@ function initRadioStreamPlayer() {
             playPauseBtn.textContent = 'Play';
         }
 
-        const currentTheme = document.documentElement.classList.contains('dark-theme') ? 'dark-theme' : 'light-theme';
-        const popoutUrl = `tools/radiostream-player/popout.html?station=${encodeURIComponent(stationSelect.value)}&theme=${currentTheme}`;
+        const isDark = document.documentElement.classList.contains('dark-theme');
+        const popoutUrl = `popout.html?station=${encodeURIComponent(stationSelect.value)}&theme=${isDark ? 'dark' : 'light'}`;
         state.popoutWindow = window.open(popoutUrl, 'RadioStreamPopout', 'width=300,height=278');
+
+        // Hide main player controls and show notice
+        document.querySelector('.radiostream-player .player-content').style.display = 'none';
+        if (popoutNotice) popoutNotice.style.display = 'block';
     });
 
     window.addEventListener('message', (event) => {
         if (event.data.type === 'popoutClosed') {
+            // Restore main player controls
+            document.querySelector('.radiostream-player .player-content').style.display = 'flex';
+            if (popoutNotice) popoutNotice.style.display = 'none';
+
+            // Resume playback in main window if it was playing before popout
             state.popoutWindow = null;
             if (state.isPlaying) {
                 audio.play().catch(err => {
@@ -534,7 +572,6 @@ function initRadioStreamPlayer() {
 
     // Cleanup
     window.addEventListener('beforeunload', cleanup);
-    document.addEventListener('toolUnload', cleanup);
 
     function cleanup() {
         if (isPlaying) {
@@ -550,6 +587,9 @@ function initRadioStreamPlayer() {
     }
 }
 
-if (document.getElementById('station-select')) {
-    initRadioStreamPlayer();
-}
+document.addEventListener('DOMContentLoaded', () => {
+    if (document.getElementById('station-select')) {
+        initThemeSwitcher();
+        initRadioStreamPlayer();
+    }
+});
